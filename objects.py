@@ -9,3 +9,9 @@ class Object(pygame.sprite.Sprite):
         self.rect = self.image.get_frect(topleft = pos)
         self.hitbox = self.rect.copy().inflate(0, 0)
         self.z = z
+
+class Wall(Object):
+    def __init__(self, groups, pos, z, surf):
+        super().__init__(groups, pos, z, surf)
+
+        self.hitbox = self.rect.copy().inflate(0, -self.rect.height/2)

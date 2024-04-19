@@ -13,6 +13,7 @@ class NPC(pygame.sprite.Sprite):
         self.frame_index = 0
         self.image = self.animations['idle_left'][self.frame_index].convert_alpha()
         self.rect = self.image.get_frect(topleft = pos)
+        self.hitbox = self.rect.copy().inflate(-self.rect.width/2, -self.rect.height/2)
         self.speed = 80
         self.force = 2000
         self.acc = vec()
@@ -43,18 +44,28 @@ class NPC(pygame.sprite.Sprite):
 
     def collisions(self, axis, group):
         for sprite in self.get_collision_list(group):
-            if self.hitbox.colliderect(sprite.hitbox)
-                if axis == x:
-                    pass
+            if self.hitbox.colliderect(sprite.hitbox):
+                if axis == 'x':
+                    if self.vel.x >= 0: self.hitbox.right = sprite.hitbox.left
+                    if self.vel.x <= 0: self.hitbox.left = sprite.hitbox.right
+                    self.rect.centerx = self.hitbox.centerx
+                if axis == 'y':
+                    if self.vel.y >= 0: self.hitbox.bottom = sprite.hitbox.top
+                    if self.vel.y <= 0: self.hitbox.top = sprite.hitbox.bottom
+                    self.rect.centery = self.hitbox.centery
 
     def physics(self, dt):
         self.acc.x += self.vel.x *self.frict
         self.vel.x += self.acc.x *dt
-        self.rect.centerx += self.vel.x * dt + (self.vel.x/2 * dt)
+        self.hitbox.centerx += self.vel.x * dt + (self.vel.x/2 * dt)
+        self.rect.centerx = self.hitbox.centerx
+        self.collisions('x', self.scene.block_sprites)
 
         self.acc.y += self.vel.y * self.frict
         self.vel.y += self.acc.y * dt
-        self.rect.centery += self.vel.y * dt + (self.vel.y / 2 * dt)
+        self.hitbox.centery += self.vel.y * dt + (self.vel.y / 2 * dt)
+        self.rect.centery = self.hitbox.centery
+        self.collisions('y', self.scene.block_sprites)
 
         if self.vel.magnitude() > self.speed:
             self.vel = self.vel.normalize() * self.speed
