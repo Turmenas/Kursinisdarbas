@@ -67,6 +67,8 @@ class Game:
                     INPUTS['s'] = True
                 elif event.key == pygame.K_F12:
                     INPUTS['f12'] = True
+                elif event.key == pygame.K_e:
+                    INPUTS['e'] = True
 
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_SPACE:
@@ -81,6 +83,8 @@ class Game:
                     INPUTS['s'] = False
                 elif event.key == pygame.K_F12:
                     INPUTS['f12'] = False
+                elif event.key == pygame.K_e:
+                    INPUTS['e'] = False
 
             if event.type == pygame.MOUSEWHEEL:
                 if event.y == 1:

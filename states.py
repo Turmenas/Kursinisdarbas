@@ -1,9 +1,10 @@
 import pygame
 from config import *
 from camera import Camera
-from Characters import Player
+from Player import Player
 from objects import Object, Wall
 from pytmx.util_pygame import  load_pygame
+
 
 class State:
     def __init__(self, game):
@@ -77,5 +78,6 @@ class Scene(State):
         self.camera.draw(screen, self.drawn_sprites)
         if INPUTS['f12']:
             self.debug([
-                str('FPS ' +  str(round(self.game.clock.get_fps(), 2))),
+                str('FPS: ' +  str(round(self.game.clock.get_fps(), 2))),
+                str('state: ' + str(self.player.state)),
             ])
