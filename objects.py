@@ -15,3 +15,9 @@ class Wall(Object):
         super().__init__(groups, pos, z, surf)
 
         self.hitbox = self.rect.copy().inflate(0, -self.rect.height/2)
+
+class Background(Object):
+    def __init__(self, groups, pos, z, surf):
+        super().__init__(groups, pos, z, surf)
+
+        self.hitbox = self.rect.copy().inflate(-self.rect.width, -self.rect.height)

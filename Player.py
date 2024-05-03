@@ -70,7 +70,7 @@ class Dodge:
         INPUTS['right_click'] = False
         self.timer = 2
         self.dodge_pending = False
-        self.vel = character.vec_to_mouse(150)
+        self.vel = character.vec_to_mouse(300)
 
     def enter_state(self, character):
         if INPUTS['right_click']:
@@ -83,7 +83,7 @@ class Dodge:
 
     def update_state(self, dt, character):
         self.timer -= dt
-        character.animate(f'dodge', 3 * dt)
+        character.animate(f'dodge', 5 * dt)
         character.physics(dt, -2)
         character.acc = vec()
         character.vel = self.vel

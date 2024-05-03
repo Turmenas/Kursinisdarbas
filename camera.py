@@ -30,7 +30,7 @@ class Camera(pygame.sprite.Group):
         self.visible_screen.y = self.offset.y
 
     def draw(self, screen, group):
-        screen.fill(COLORS['green'])
+        screen.fill(COLORS['black'])
         for layer in LAYERS:
             for sprite in sorted(group, key=lambda sprite: sprite.rect.centery):
                 if self.visible_screen.colliderect(sprite.rect) and sprite.z == layer:

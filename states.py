@@ -2,7 +2,7 @@ import pygame
 from config import *
 from camera import Camera
 from Player import Player
-from objects import Object, Wall
+from objects import *
 from pytmx.util_pygame import  load_pygame
 
 
@@ -58,6 +58,10 @@ class Scene(State):
         if 'blocks' in layers:
             for x, y, surf in self.tmx_data.get_layer_by_name('blocks').tiles():
                Wall([self.block_sprites, self.drawn_sprites], (x * TILE_SIZE, y * TILE_SIZE), 'blocks', surf)
+
+        if 'background' in layers:
+            for x, y, surf in self.tmx_data.get_layer_by_name('background').tiles():
+               Background([self.block_sprites, self.drawn_sprites], (x * TILE_SIZE, y * TILE_SIZE), 'background', surf)
 
         if 'entries' in layers:
             for obj in self.tmx_data.get_layer_by_name('entries'):
