@@ -1,12 +1,33 @@
 import pygame
 from config import *
 from Characters import NPC
+from Enemy import Enemy
 
 class Player(NPC):
     def __init__(self, game, scene, group, pos, z, name):
         super().__init__(game, scene, group, pos, z, name)
-
         self.state = Idle(self)
+
+    def update(self, dt):
+        self.get_direction()
+        self.exit_scene()
+        self.change_state()
+        self.state.update_state(dt, self)
+        self.check_enemy_collision()
+
+    def check_enemy_collision(self):
+        enemies = pygame.sprite.Group()  # Create a new group for enemy sprites
+        for sprite in self.scene.update_sprites:
+            if isinstance(sprite, Enemy):  # Check if the sprite is an instance of the Enemy class
+                enemies.add(sprite)  # Add the enemy sprite to the group
+
+        if pygame.sprite.spritecollideany(self, enemies):
+            self.handle_death()
+
+    def handle_death(self):
+        if isinstance(self, Player):
+            self.kill()
+            self.game.running = False
 
     def movement(self):
         if INPUTS['a']:
@@ -29,61 +50,68 @@ class Player(NPC):
             direction.normalize_ip()
             return direction*speed
 
+    def exit_scene(self):
+        for exit in self.scene.exit_sprites:
+            if self.hitbox.colliderect(exit.rect):
+                self.scene.new_scene = SCENE_DATA[int(self.scene.current_scene)][int(exit.number)]
+                self.scene.entry_point = exit.number
+                #self.scene.transition.exiting = True
+                self.scene.go_to_scene()
 
 class Idle:
-    def __init__(self, character):
-        character.frame_index=0
+    def __init__(self, player):
+        player.frame_index=0
 
-    def enter_state(self, character):
-        if character.vel.magnitude() > 1:
-            return Move(character)
+    def enter_state(self, player):
+        if player.vel.magnitude() > 1:
+            return Move(player)
 
         if INPUTS['right_click']:
-            return Dodge(character)
+            return Dodge(player)
 
-    def update_state(self, dt, character):
-        character.animate(f'idle_{character.get_direction()}', 2 * dt)
-        character.movement()
-        character.physics(dt, character.frict)
+    def update_state(self, dt, player):
+        player.animate(f'idle_{player.get_direction()}', 2 * dt)
+        player.movement()
+        player.physics(dt, player.frict)
 
 
 class Move:
-    def __init__(self, character):
-        Idle.__init__(self, character)
+    def __init__(self, player):
+        Idle.__init__(self, player)
 
-    def enter_state(self, character):
-        if character.vel.magnitude() < 1:
-            return Idle(character)
+    def enter_state(self, player):
+        if player.vel.magnitude() < 1:
+            return Idle(player)
 
         if INPUTS['right_click']:
-            return Dodge(character)
+            return Dodge(player)
 
-    def update_state(self, dt, character):
-        character.animate(f'move_{character.get_direction()}', 3 * dt)
-        character.movement()
-        character.physics(dt, character.frict)
+    def update_state(self, dt, player):
+        player.animate(f'move_{player.get_direction()}', 3 * dt)
+        player.movement()
+        player.physics(dt, player.frict)
 
 
 class Dodge:
-    def __init__(self, character):
-        Idle.__init__(self, character)
+    def __init__(self, player):
+        Idle.__init__(self, player)
         INPUTS['right_click'] = False
-        self.timer = 2
+        self.timer =1
         self.dodge_pending = False
-        self.vel = character.vec_to_mouse(300)
+        self.vel = player.vec_to_mouse(300)
 
-    def enter_state(self, character):
+    def enter_state(self, player):
         if INPUTS['right_click']:
             self.dodge_pending = True
         if self.timer <= 0:
             if self.dodge_pending:
-                return Dodge(character)
+                return Dodge(player)
             else:
-                return Idle(character)
+                return Idle(player)
 
-    def update_state(self, dt, character):
+    def update_state(self, dt, player):
         self.timer -= dt
-        character.animate(f'dodge', 5 * dt)
-        character.physics(dt, -2)
-        character.acc = vec()
-        character.vel = self.vel
+        player.animate(f'dodge', 10 * dt)
+        player.physics(dt, -5)
+        player.acc = vec()
+        player.vel = self.vel

@@ -10,4 +10,9 @@ INPUTS = {'escape': False, 'space': False, 'w': False, 's': False, 'd': False, '
 
 COLORS = {'black': (0, 0, 0), 'white': (255, 255, 255), 'red': (200, 100, 100), 'green': (100, 200, 100), 'blue': (100, 100, 200)}
 
-LAYERS = ['background', 'objects', 'characters', 'blocks', 'foreground']
+LAYERS = ['background', 'objects', 'characters', 'semiblocks', 'blocks', 'foreground']
+
+SCENE_DATA = {
+    0:{1:1},
+    1:{2:2}
+}

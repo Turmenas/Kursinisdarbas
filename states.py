@@ -1,7 +1,9 @@
 import pygame
 from config import *
 from camera import Camera
+from Characters import NPC
 from Player import Player
+from Enemy import Enemy
 from objects import *
 from pytmx.util_pygame import  load_pygame
 
@@ -31,24 +33,30 @@ class TitleScreen(State):
 
     def update(self, dt):
         if INPUTS['space']:
-            Scene(self.game).enter_state()
+            Scene(self.game, '0', '0').enter_state()
             self.game.reset_inputs()
 
     def draw(self, screen):
-        screen.fill(COLORS['green'])
-        self.game.render_text('This is the title screen, press space :)', COLORS['black'], self.game.font, (WIDTH/2, HEIGHT/2), centered=True)
+        screen.fill(COLORS['black'])
+        self.game.render_text('This is the title screen, press space :)', COLORS['white'], self.game.font, (WIDTH/2, HEIGHT/2), centered=True)
 
 class Scene(State):
-    def __init__(self, game):
+    def __init__(self, game, current_scene, entry_point):
         State.__init__(self, game)
+        self.current_scene = current_scene
+        self.entry_point = entry_point
 
         self.camera = Camera(self)
         self.update_sprites = pygame.sprite.Group()
         self.drawn_sprites = pygame.sprite.Group()
         self.block_sprites = pygame.sprite.Group()
+        self.exit_sprites = pygame.sprite.Group()
 
-        self.tmx_data = load_pygame('scenes/0/0.tmx')
+        self.tmx_data = load_pygame(f'scenes/{self.current_scene}/{self.current_scene}.tmx')
         self.create_scene()
+
+    def go_to_scene(self):
+        Scene(self.game, self.new_scene, self.entry_point).enter_state()
 
     def create_scene(self):
         layers = []
@@ -63,16 +71,35 @@ class Scene(State):
             for x, y, surf in self.tmx_data.get_layer_by_name('background').tiles():
                Background([self.block_sprites, self.drawn_sprites], (x * TILE_SIZE, y * TILE_SIZE), 'background', surf)
 
+        if 'semiblocks' in layers:
+            for x, y, surf in self.tmx_data.get_layer_by_name('semiblocks').tiles():
+                Barrier([self.block_sprites, self.drawn_sprites], (x * TILE_SIZE, y * TILE_SIZE), 'semiblocks', surf)
+
+        if 'foreground' in layers:
+            for x, y, surf in self.tmx_data.get_layer_by_name('foreground').tiles():
+               Background([self.block_sprites, self.drawn_sprites], (x * TILE_SIZE, y * TILE_SIZE), 'foreground', surf)
+
         if 'entries' in layers:
             for obj in self.tmx_data.get_layer_by_name('entries'):
-                if obj.name == '0':
+                if obj.name == f'{self.current_scene}':
                     self.player = Player(self.game, self, [self.update_sprites, self.drawn_sprites],
                                          (obj.x, obj.y),'blocks' , 'player')
+                    self.target = self.player
+
+        if 'entities' in layers:
+            for obj in self.tmx_data.get_layer_by_name('entities'):
+                if obj.name == 'enemy':
+                    self.enemy = Enemy(self.game, self, [self.update_sprites, self.drawn_sprites],
+                                         (obj.x, obj.y),'blocks' , 'player')
+
+        if 'exits' in layers:
+            for obj in self.tmx_data.get_layer_by_name('exits'):
+                Collider([self.exit_sprites], (obj.x, obj.y), (obj.width, obj.height), obj.name)
 
 
     def update(self, dt):
         self.update_sprites.update(dt)
-        self.camera.update(dt, self.player)
+        self.camera.update(dt, self.target)
 
     def debug(self, debug_list):
         for index, name in enumerate(debug_list):
