@@ -81,8 +81,6 @@ class Game:
                     INPUTS['w'] = False
                 elif event.key == pygame.K_s:
                     INPUTS['s'] = False
-                elif event.key == pygame.K_F12:
-                    INPUTS['f12'] = False
                 elif event.key == pygame.K_e:
                     INPUTS['e'] = False
 

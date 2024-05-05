@@ -108,18 +108,18 @@ class NPC(pygame.sprite.Sprite):
                 if axis == 'x':
                     if self.vel.x > 0:
                         self.hitbox.right = sprite.hitbox.left
-                        self.vel.x = 0  # Ensure velocity is set to zero when collision occurs on the right
+                        self.vel.x = 0
                     elif self.vel.x < 0:
                         self.hitbox.left = sprite.hitbox.right
-                        self.vel.x = 0  # Ensure velocity is set to zero when collision occurs on the left
+                        self.vel.x = 0
                     self.rect.centerx = self.hitbox.centerx
                 if axis == 'y':
                     if self.vel.y > 0:
                         self.hitbox.bottom = sprite.hitbox.top
-                        self.vel.y = 0  # Ensure velocity is set to zero when collision occurs on the bottom
+                        self.vel.y = 0
                     elif self.vel.y < 0:
                         self.hitbox.top = sprite.hitbox.bottom
-                        self.vel.y = 0  # Ensure velocity is set to zero when collision occurs on the top
+                        self.vel.y = 0
                     self.rect.centery = self.hitbox.centery
 
     def physics(self, dt, frict):

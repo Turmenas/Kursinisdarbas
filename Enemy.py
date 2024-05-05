@@ -21,7 +21,6 @@ class Enemy(NPC):
             return random.choice(unblocked_directions) if unblocked_directions else self.direction
         return random.choice(unblocked_directions) if unblocked_directions else None
 
-
     def update(self, dt):
         self.stuck_timer += dt
         self.change_state()
@@ -60,4 +59,3 @@ class Move:
         enemy.animate(f'move_{enemy.direction}', 2 * dt)
         enemy.movement()
         enemy.physics(dt, enemy.frict)
-

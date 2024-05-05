@@ -2,12 +2,12 @@ import pygame
 from config import *
 from Characters import NPC
 from Enemy import Enemy
+from Chest import Chest
 
 class Player(NPC):
     def __init__(self, game, scene, group, pos, z, name):
         super().__init__(game, scene, group, pos, z, name)
         self.state = Idle(self)
-        self.alive = True
 
     def update(self, dt):
         self.get_direction()
@@ -23,6 +23,15 @@ class Player(NPC):
                 enemies.add(sprite)
 
         if pygame.sprite.spritecollideany(self, enemies):
+            return True
+
+    def check_chest_collision(self):
+        chest = pygame.sprite.Group()
+        for sprite in self.scene.update_sprites:
+            if isinstance(sprite, Chest):
+                chest.add(sprite)
+
+        if pygame.sprite.spritecollideany(self, chest):
             return True
 
     def handle_death(self):
@@ -56,7 +65,6 @@ class Player(NPC):
             if self.hitbox.colliderect(exit.rect):
                 self.scene.new_scene = SCENE_DATA[int(self.scene.current_scene)][int(exit.number)]
                 self.scene.entry_point = exit.number
-                #self.scene.transition.exiting = True
                 self.scene.go_to_scene()
 
 class Idle:
@@ -69,9 +77,6 @@ class Idle:
 
         if INPUTS['right_click']:
             return Dodge(player)
-
-        if INPUTS['left_click']:
-            return Attack(player)
 
         if player.check_enemy_collision():
             return Death(player)
@@ -92,9 +97,6 @@ class Move:
 
         if INPUTS['right_click']:
             return Dodge(player)
-
-        if INPUTS['left_click']:
-            return Attack(player)
 
         if player.check_enemy_collision():
             return Death(player)
@@ -136,28 +138,27 @@ class Death:
     def update_state(self, dt, player):
         player.handle_death()
 
-class Attack:
+class Dodge:
     def __init__(self, player):
         Idle.__init__(self, player)
-        INPUTS['left_click'] = False
+        INPUTS['right_click'] = False
         self.timer =1
-        self.attack_pending = False
-        self.vel = player.vec_to_mouse(20)
-        self.attacking = True
+        self.dodge_pending = False
+        self.vel = player.vec_to_mouse(300)
 
     def enter_state(self, player):
         if INPUTS['right_click']:
-            self.attack_pending = True
+            self.dodge_pending = True
         if self.timer <= 0:
-            if self.attack_pending:
-                return Attack(player)
+            if self.dodge_pending:
+                return Dodge(player)
             else:
-                self.attacking = False
                 return Idle(player)
 
     def update_state(self, dt, player):
         self.timer -= dt
-        player.animate(f'attack_right', 5 * dt)
+        player.animate(f'dodge', 10 * dt)
         player.physics(dt, -5)
         player.acc = vec()
         player.vel = self.vel
+

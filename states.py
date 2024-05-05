@@ -3,6 +3,7 @@ from config import *
 from camera import Camera
 from Characters import NPC
 from Player import Player
+from Chest import Chest
 from Enemy import Enemy
 from objects import *
 from pytmx.util_pygame import  load_pygame
@@ -39,6 +40,18 @@ class TitleScreen(State):
     def draw(self, screen):
         screen.fill(COLORS['black'])
         self.game.render_text('This is the title screen, press space :)', COLORS['white'], self.game.font, (WIDTH/2, HEIGHT/2), centered=True)
+
+class EndScreen(State):
+    def __init__(self, game):
+        State.__init__(self, game)
+
+    def update(self, dt):
+        if INPUTS['space']:
+            self.game.running = False
+
+    def draw(self, screen):
+        screen.fill(COLORS['black'])
+        self.game.render_text('You got the treasure, press space to quit', COLORS['white'], self.game.font, (WIDTH/2, HEIGHT/2), centered=True)
 
 class Scene(State):
     def __init__(self, game, current_scene, entry_point):
@@ -91,6 +104,9 @@ class Scene(State):
                 if obj.name == 'enemy':
                     self.enemy = Enemy(self.game, self, [self.update_sprites, self.drawn_sprites],
                                          (obj.x, obj.y),'characters' , 'enemy')
+                if obj.name == 'chest':
+                    self.chest = Chest(self.game, self, [self.update_sprites, self.drawn_sprites],
+                                         (obj.x, obj.y),'characters' , 'chest')
 
         if 'exits' in layers:
             for obj in self.tmx_data.get_layer_by_name('exits'):
@@ -100,6 +116,8 @@ class Scene(State):
     def update(self, dt):
         self.update_sprites.update(dt)
         self.camera.update(dt, self.target)
+        if self.player.check_chest_collision():
+            EndScreen(self.game).enter_state()
 
     def debug(self, debug_list):
         for index, name in enumerate(debug_list):
