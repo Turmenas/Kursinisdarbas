@@ -170,3 +170,5 @@ class Move:
         character.animate(f'move_{character.get_direction()}', 3 * dt)
         character.movement()
         character.physics(dt)
+
+

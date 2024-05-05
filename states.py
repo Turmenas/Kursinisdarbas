@@ -90,7 +90,7 @@ class Scene(State):
             for obj in self.tmx_data.get_layer_by_name('entities'):
                 if obj.name == 'enemy':
                     self.enemy = Enemy(self.game, self, [self.update_sprites, self.drawn_sprites],
-                                         (obj.x, obj.y),'blocks' , 'player')
+                                         (obj.x, obj.y),'characters' , 'enemy')
 
         if 'exits' in layers:
             for obj in self.tmx_data.get_layer_by_name('exits'):

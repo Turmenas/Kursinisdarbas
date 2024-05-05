@@ -3,13 +3,14 @@ import pygame
 from config import *
 from Characters import NPC
 
+
 class Enemy(NPC):
     def __init__(self, game, scene, group, pos, z, name):
         super().__init__(game, scene, group, pos, z, name)
         self.state = Move(self)
         self.direction = random.choice(['left', 'right', 'up', 'down'])
-        self.speed = 5  # Reduced speed for slower movement
-        self.hitbox = self.rect.copy().inflate(-self.rect.width / 2, -self.rect.height / 2)
+        self.speed = 5
+        self.hitbox = self.rect.copy().inflate(-self.rect.width / 1.5, -self.rect.height / 1.5)
         self.stuck_timer = 0
         self.change_direction_interval = 3
 
@@ -19,6 +20,7 @@ class Enemy(NPC):
             self.stuck_timer = 0
             return random.choice(unblocked_directions) if unblocked_directions else self.direction
         return random.choice(unblocked_directions) if unblocked_directions else None
+
 
     def update(self, dt):
         self.stuck_timer += dt
@@ -48,10 +50,14 @@ class Move:
             enemy.direction = enemy.get_direction()
             return Idle(enemy)
 
+        # if enemy.check_player_collision():
+            # return Death(enemy)
+
     def update_state(self, dt, enemy):
         self.max_travel -= dt
         if self.max_travel > 0:
             enemy.move[f'{enemy.direction}'] = True
-        enemy.animate(f'move_{enemy.direction}', 3 * dt)
+        enemy.animate(f'move_{enemy.direction}', 2 * dt)
         enemy.movement()
         enemy.physics(dt, enemy.frict)
+

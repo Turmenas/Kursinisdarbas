@@ -7,22 +7,23 @@ class Player(NPC):
     def __init__(self, game, scene, group, pos, z, name):
         super().__init__(game, scene, group, pos, z, name)
         self.state = Idle(self)
+        self.alive = True
 
     def update(self, dt):
         self.get_direction()
         self.exit_scene()
         self.change_state()
         self.state.update_state(dt, self)
-        self.check_enemy_collision()
+
 
     def check_enemy_collision(self):
-        enemies = pygame.sprite.Group()  # Create a new group for enemy sprites
+        enemies = pygame.sprite.Group()
         for sprite in self.scene.update_sprites:
-            if isinstance(sprite, Enemy):  # Check if the sprite is an instance of the Enemy class
-                enemies.add(sprite)  # Add the enemy sprite to the group
+            if isinstance(sprite, Enemy):
+                enemies.add(sprite)
 
         if pygame.sprite.spritecollideany(self, enemies):
-            self.handle_death()
+            return True
 
     def handle_death(self):
         if isinstance(self, Player):
@@ -69,6 +70,12 @@ class Idle:
         if INPUTS['right_click']:
             return Dodge(player)
 
+        if INPUTS['left_click']:
+            return Attack(player)
+
+        if player.check_enemy_collision():
+            return Death(player)
+
     def update_state(self, dt, player):
         player.animate(f'idle_{player.get_direction()}', 2 * dt)
         player.movement()
@@ -85,6 +92,12 @@ class Move:
 
         if INPUTS['right_click']:
             return Dodge(player)
+
+        if INPUTS['left_click']:
+            return Attack(player)
+
+        if player.check_enemy_collision():
+            return Death(player)
 
     def update_state(self, dt, player):
         player.animate(f'move_{player.get_direction()}', 3 * dt)
@@ -112,6 +125,39 @@ class Dodge:
     def update_state(self, dt, player):
         self.timer -= dt
         player.animate(f'dodge', 10 * dt)
+        player.physics(dt, -5)
+        player.acc = vec()
+        player.vel = self.vel
+
+class Death:
+    def __init__(self, player):
+        Idle.__init__(self, player)
+
+    def update_state(self, dt, player):
+        player.handle_death()
+
+class Attack:
+    def __init__(self, player):
+        Idle.__init__(self, player)
+        INPUTS['left_click'] = False
+        self.timer =1
+        self.attack_pending = False
+        self.vel = player.vec_to_mouse(20)
+        self.attacking = True
+
+    def enter_state(self, player):
+        if INPUTS['right_click']:
+            self.attack_pending = True
+        if self.timer <= 0:
+            if self.attack_pending:
+                return Attack(player)
+            else:
+                self.attacking = False
+                return Idle(player)
+
+    def update_state(self, dt, player):
+        self.timer -= dt
+        player.animate(f'attack_right', 5 * dt)
         player.physics(dt, -5)
         player.acc = vec()
         player.vel = self.vel
