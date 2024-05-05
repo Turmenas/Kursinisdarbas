@@ -7,9 +7,10 @@ from Chest import Chest
 from Enemy import Enemy
 from objects import *
 from pytmx.util_pygame import  load_pygame
+from abc import ABC, abstractmethod
 
 
-class State:
+class State(ABC):
     def __init__(self, game):
         self.game = game
         self.prev_state = None
@@ -22,9 +23,11 @@ class State:
     def exit_state(self):
         self.game.states.pop()
 
+    @abstractmethod
     def update(self, dt):
         pass
 
+    @abstractmethod
     def draw(self, screen):
         pass
 
@@ -39,7 +42,7 @@ class TitleScreen(State):
 
     def draw(self, screen):
         screen.fill(COLORS['black'])
-        self.game.render_text('This is the title screen, press space :)', COLORS['white'], self.game.font, (WIDTH/2, HEIGHT/2), centered=True)
+        self.game.render_text('Press space to play', COLORS['white'], self.game.font, (WIDTH/2, HEIGHT/2), centered=True)
 
 class EndScreen(State):
     def __init__(self, game):
@@ -103,7 +106,7 @@ class Scene(State):
             for obj in self.tmx_data.get_layer_by_name('entities'):
                 if obj.name == 'enemy':
                     self.enemy = Enemy(self.game, self, [self.update_sprites, self.drawn_sprites],
-                                         (obj.x, obj.y),'characters' , 'enemy')
+                                         (obj.x, obj.y),'blocks' , 'enemy')
                 if obj.name == 'chest':
                     self.chest = Chest(self.game, self, [self.update_sprites, self.drawn_sprites],
                                          (obj.x, obj.y),'characters' , 'chest')

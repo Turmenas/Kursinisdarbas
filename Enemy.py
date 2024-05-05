@@ -10,7 +10,7 @@ class Enemy(NPC):
         self.state = Move(self)
         self.direction = random.choice(['left', 'right', 'up', 'down'])
         self.speed = 5
-        self.hitbox = self.rect.copy().inflate(-self.rect.width / 1.5, -self.rect.height / 1.5)
+        self.hitbox = self.rect.copy().inflate(-self.rect.width/2, -self.rect.height/2)
         self.stuck_timer = 0
         self.change_direction_interval = 3
 
@@ -56,6 +56,6 @@ class Move:
         self.max_travel -= dt
         if self.max_travel > 0:
             enemy.move[f'{enemy.direction}'] = True
-        enemy.animate(f'move_{enemy.direction}', 2 * dt)
+        enemy.animate(f'move_{enemy.direction}', dt)
         enemy.movement()
         enemy.physics(dt, enemy.frict)
