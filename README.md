@@ -1,9 +1,9 @@
 # Kursinisdarbas
 # Įvadas
 
-Kursiinio darbo tikslas buvo kurti žaidimą, laikantis objektinio programavimo reikalavimų. Programa yra požemių nagrinėjimo žaidimas su viršaus perspektyva.
+Kursinio darbo tikslas buvo sukurti žaidimą, laikantis objektinio programavimo reikalavimų. Programa yra požemių tyrinėjimo žaidimas su viršaus perspektyva.
 
-Norint paleisti programą, reikia įdiegti `pygame-ce` ir `pytmx` bibliotekas. Norint paleisti programą, reikia atidaryti terminalą ten, kur yra programos failai, ir įrašyti komandą `python main.py`.
+Norint paleisti programą, reikia įdiegti `pygame` ir `pytmx` bibliotekas. Norint paleisti programą, reikia atidaryti terminalą ten, kur yra programos failai, ir įvesti komandą `python main.py`.
 
 ## Pagrindiniai valdymo klavišai
 
